@@ -24,7 +24,7 @@ class JavaExhaustiveSwitchUseCases {
                     );
             case ConstraintViolationException constraintViolationException -> ProblemDetail.forStatusAndDetail(
                     HttpStatus.BAD_REQUEST,
-                    "Wert ist nicht eindeutig: %s".formatted(constraintViolationException.getConstraintName())
+                    "Integritätsprüfung fehlgeschlagen: %s".formatted(constraintViolationException.getConstraintName())
             );
 
             // -> Fallback
