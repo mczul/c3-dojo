@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="katas/sql_dml/init" author="c.zuleger@cronos.de">
+        <sql>
+            create schema sql_dml;
+        </sql>
+
+        <createTable schemaName="sql_dml" tableName="contacts">
+            <column name="id"
+                    type="uuid">
+                <constraints primaryKey="true" primaryKeyName="contact_pk"/>
+            </column>
+
+            <column name="email"
+                    type="varchar(255)">
+                <constraints nullable="false" notNullConstraintName="email_man"
+                             unique="true" uniqueConstraintName="email_un"/>
+            </column>
+
+            <column name="name"
+                    type="varchar(255)">
+                <constraints nullable="false" notNullConstraintName="name_man"/>
+            </column>
+
+            <column name="created_at"
+                    type="timestamptz">
+                <constraints nullable="false" notNullConstraintName="created_at_man"/>
+            </column>
+        </createTable>
+
+    </changeSet>
+
+</databaseChangeLog>

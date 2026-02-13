@@ -1,0 +1,9 @@
+services:
+  postgres:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=c3_dojo'
+      - 'POSTGRES_PASSWORD=secret4Ever!'
+      - 'POSTGRES_USER=master'
+    ports:
+      - '5400:5432'
