@@ -3,7 +3,6 @@ package de.cronoscx.c3.dojo.katas.sql_dml;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(SqlDmlUseCases.API_PATH)
 @RequiredArgsConstructor
-@Qualifier("sql_dml")
 class SqlDmlUseCases {
     static final String API_PATH = "/sql-dml";
 

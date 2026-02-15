@@ -33,13 +33,13 @@ class SpringFeatureFlagsUseCasesIT {
         void depending_on_operation_system() {
             // given
             final var targetSanitizerClass = MacOsSanitizer.class;
-            final var actualOS = System.getProperty(Config.PROPERTY_OS_NAME_KEY);
+            final var actualOS = System.getProperty(SpringFeatureFlagsConfig.PROPERTY_OS_NAME_KEY);
 
             // when
             final var activeSanitizers = underTest.sanitizers;
 
             // then
-            if (actualOS.equalsIgnoreCase(Config.PROPERTY_OS_NAME_VALUE_MACOS)) {
+            if (actualOS.equalsIgnoreCase(SpringFeatureFlagsConfig.PROPERTY_OS_NAME_VALUE_MACOS)) {
                 assertThat(activeSanitizers).hasAtLeastOneElementOfType(targetSanitizerClass);
             } else {
                 assertThat(activeSanitizers).doesNotHaveAnyElementsOfTypes(targetSanitizerClass);

@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableConfigurationProperties({ConfigProperties.class})
-class Config {
+class SpringFeatureFlagsConfig {
     public static final String PROPERTY_OS_NAME_KEY = "os.name";
     public static final String PROPERTY_OS_NAME_VALUE_MACOS = "Mac OS X";
 
