@@ -2,6 +2,8 @@ package de.cronoscx.c3.dojo.katas.spring_ai_rag;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.AbstractMessage;
+import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.ollama.api.OllamaChatOptions;
 import org.springframework.ai.ollama.api.OllamaModel;
@@ -33,11 +35,10 @@ class SpringAiRagUseCases {
         return Optional.ofNullable(requestSpec.user(message)
                         .call()
                         .chatResponse())
-                .map(response -> response.getResult()
-                        .getOutput()
-                        .getText())
+                .flatMap(chatResponse -> Optional.ofNullable(chatResponse.getResult()))
+                .map(Generation::getOutput)
+                .map(AbstractMessage::getText)
                 .orElse("LLM antwortet nicht.");
-//        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }
