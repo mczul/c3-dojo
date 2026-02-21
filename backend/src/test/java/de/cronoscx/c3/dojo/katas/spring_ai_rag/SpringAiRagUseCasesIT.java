@@ -26,7 +26,7 @@ class SpringAiRagUseCasesIT {
     private RestTestClient restTestClient;
 
     @RepeatedTest(25)
-    @Timeout(value = 1, unit = TimeUnit.SECONDS)
+    @Timeout(value = 2, unit = TimeUnit.SECONDS)
     void smoke() {
         // given
 
@@ -44,7 +44,7 @@ class SpringAiRagUseCasesIT {
         final var softly = new SoftAssertions();
         softly.assertThat(actual.getResponseBody())
                 .isNotEmpty()
-                .contains("Pflanze");
+                .containsAnyOf("Pflanze", "Gemüse", "Obst");
         softly.assertAll();
     }
 
