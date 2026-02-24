@@ -11,6 +11,13 @@ Erfahrungen.
 Da sich in unserem Beratungs-Alltag die Laufzeitumgebungen in Abhängigkeit vom Projektkontext ändern können, bietet sich
 die Nutzung von Tools zur Verwaltung an.
 
+## GenAI mit Ollama
+
+```bash
+brew install ollama
+
+```
+
 ## Java
 
 Sehr empfehlenswert ist SDKMAN!
@@ -36,10 +43,12 @@ Wende Dich an einen beliebigen Christoph im C3-Team.
 
 * https://wheelofnames.com/
     * Themen
-        * CSS
-        * SQL
-        * Java
-        * Spring
+        * CSS :: Responsive Grid
+        * SQL :: DML
+        * Java :: Exhaustive Switch
+        * Spring :: Config
+        * Spring :: AI :: RAG
+        * Spring :: AI :: MCP
     * Personen
         * David
         * Lasse
