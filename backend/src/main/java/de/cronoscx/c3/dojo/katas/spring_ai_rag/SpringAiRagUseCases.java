@@ -1,13 +1,11 @@
 package de.cronoscx.c3.dojo.katas.spring_ai_rag;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.messages.AbstractMessage;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.ollama.api.OllamaChatOptions;
-import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,27 +16,26 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping(SpringAiRagUseCases.API_PATH)
-@RequiredArgsConstructor
 class SpringAiRagUseCases {
     static final String API_PATH = "/spring-ai-rag";
 
-    private final VectorStore vectorStore;
     private final ChatClient chatClient;
+
+    SpringAiRagUseCases(@Qualifier(SpringAiRagConfig.QUALIFIER_AI_RAG) ChatClient chatClient) {
+        this.chatClient = chatClient;
+    }
 
     @PostMapping
     String chat(@RequestBody String message) {
         final var requestSpec = chatClient.prompt(new Prompt(
                 List.of(), /* */
                 OllamaChatOptions.builder()
-//                        .model(OllamaModel.LLAMA3_1)
                         .temperature(0.2)
                         .build()
         ));
 
-        return Optional.ofNullable(requestSpec.user(message)
-                        .advisors(QuestionAnswerAdvisor.builder(vectorStore)
-                                .build()
-                        )
+        return Optional.ofNullable(requestSpec
+                        .user(message)
                         .call()
                         .chatResponse())
                 .flatMap(chatResponse -> Optional.ofNullable(chatResponse.getResult()))
