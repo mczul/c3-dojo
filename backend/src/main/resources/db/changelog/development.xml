@@ -1,0 +1,61 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- Katas :: SQL :: DML -->
+
+    <changeSet id="sql-dml-katas_data" author="c.zuleger@cronos.de"
+               context="dev">
+        <insert tableName="contacts"
+                schemaName="sql_dml">
+            <column name="id">00000000-0000-0000-0000-000000000001</column>
+            <column name="email">max.mustermann@gmail.com</column>
+            <column name="name">Max Mustermann</column>
+            <column name="created_at" valueComputed="now() - interval '2 days'" />
+        </insert>
+
+        <insert tableName="contacts"
+                schemaName="sql_dml">
+            <column name="id">00000000-0000-0000-0000-000000000002</column>
+            <column name="email">moritz.mustermann@gmail.com</column>
+            <column name="name">Moritz Mustermann</column>
+            <column name="created_at" valueComputed="now() - interval '3 days'" />
+        </insert>
+
+        <insert tableName="contacts"
+                schemaName="sql_dml">
+            <column name="id">00000000-0000-0000-0001-000000000001</column>
+            <column name="email">test@gmail.com</column>
+            <column name="name">Tester 1</column>
+            <column name="created_at" valueComputed="now() - interval '1 hour'" />
+        </insert>
+
+        <insert tableName="contacts"
+                schemaName="sql_dml">
+            <column name="id">00000000-0000-0000-0001-000000000002</column>
+            <column name="email">test@example.com</column>
+            <column name="name">Tester 2</column>
+            <column name="created_at" valueComputed="now() - interval '1 day'" />
+        </insert>
+
+        <insert tableName="contacts"
+                schemaName="sql_dml">
+            <column name="id">00000000-0000-0000-0001-000000000003</column>
+            <column name="email">test@example.org</column>
+            <column name="name">Tester 3</column>
+            <column name="created_at" valueComputed="now() - interval '2 day'" />
+        </insert>
+
+        <insert tableName="contacts"
+                schemaName="sql_dml">
+            <column name="id">00000000-0000-0000-0001-000000000004</column>
+            <column name="email">test@example.de</column>
+            <column name="name">Tester 4</column>
+            <column name="created_at" valueComputed="now() - interval '3 days'" />
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

@@ -19,8 +19,8 @@ interface ContactRepository {
                     .filter(value -> !value.isBlank())
                     .map(value -> String.format("%%%s%%", value))
                     .ifPresent(email -> predicates.add(
-                    criteriaBuilder.like(root.get(Contact_.email), email)
-            ));
+                            criteriaBuilder.like(root.get(Contact_.email), email)
+                    ));
             query.getCreatedAfter().ifPresent(after -> predicates.add(
                     criteriaBuilder.greaterThanOrEqualTo(root.get(Contact_.createdAt), after)
             ));
@@ -33,6 +33,8 @@ interface ContactRepository {
                     .orElseGet(criteriaBuilder::conjunction);
         };
     }
+
+    Page<Contact> findAll(Pageable pageable);
 
     Page<Contact> findAll(Specification<Contact> specification, Pageable pageable);
 }

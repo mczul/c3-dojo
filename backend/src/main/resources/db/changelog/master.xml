@@ -9,4 +9,9 @@
 
     <includeAll relativeToChangelogFile="true" path="katas/sql_dml"/>
 
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- Development -->
+
+    <include relativeToChangelogFile="true" file="development.xml"/>
+
 </databaseChangeLog>
