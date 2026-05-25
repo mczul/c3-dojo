@@ -1,24 +1,31 @@
 package de.cronoscx.c3.dojo.katas.sql_dml;
 
 import de.cronoscx.c3.dojo.TestcontainersConfig;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DisplayNameGeneration;
+import eu.rekawek.toxiproxy.Proxy;
+import eu.rekawek.toxiproxy.model.Toxic;
+import eu.rekawek.toxiproxy.model.ToxicDirection;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase.Replace;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Katas :: Persistence :: Contacts")
 @DisplayNameGeneration(ReplaceUnderscores.class)
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = Replace.NONE)
 @ContextConfiguration(classes = {TestcontainersConfig.class})
 @TestPropertySource(properties = {
         "spring.liquibase.contexts=dev",
@@ -26,8 +33,11 @@ import static org.assertj.core.api.Assertions.assertThat;
         "logging.level.org.hibernate.session.metrics=DEBUG",
 })
 class ContactRepositoryIT {
+
     @Autowired
     private ContactRepository underTest;
+    @Autowired
+    private Proxy dbProxy;
 
     @Test
     void preconditions() {
@@ -44,6 +54,23 @@ class ContactRepositoryIT {
 
     @Nested
     class Search {
+
+        @BeforeEach
+        void beforeEach() throws IOException {
+            dbProxy.toxics().bandwidth("DOWN_BANDWIDTH", ToxicDirection.DOWNSTREAM, 1 << 10);
+            dbProxy.toxics().latency("DOWN_LATENCY", ToxicDirection.DOWNSTREAM, 20).setJitter(100);
+            dbProxy.toxics().slicer("DOWN_SLICER", ToxicDirection.DOWNSTREAM, 1 << 5, 100);
+
+            dbProxy.toxics().bandwidth("UP_BANDWIDTH", ToxicDirection.UPSTREAM, 1 << 10);
+            dbProxy.toxics().latency("UP_LATENCY", ToxicDirection.UPSTREAM, 20).setJitter(100);
+        }
+
+        @AfterEach
+        void afterEach() throws IOException {
+            for (Toxic toxic : dbProxy.toxics().getAll()) {
+                toxic.remove();
+            }
+        }
 
         @Test
         void without_restrictions() {
@@ -65,6 +92,7 @@ class ContactRepositoryIT {
                 "test",
                 "test@example",
                 "test@example.org",
+                "doesnotexist",
         })
         void by_email(String email) {
             // given
@@ -72,6 +100,29 @@ class ContactRepositoryIT {
             final var spec = underTest.buildSpecification(query);
             final var expected = underTest.findAll(Pageable.unpaged())
                     .filter(contact -> contact.getEmail().toLowerCase().startsWith(email.toLowerCase()));
+
+            // when
+            final var actual = underTest.findAll(spec, Pageable.unpaged());
+
+            // then
+            assertThat(actual)
+                    .containsExactlyInAnyOrderElementsOf(expected);
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {
+                "PT1S",
+                "PT10S",
+                "PT30S",
+                "PT1M",
+                "PT1H",
+        })
+        void by_placeholder(Duration durationFromNow) {
+            // given
+            final var query = new ContactQuery(null, Instant.now().minus(durationFromNow), null);
+            final var spec = underTest.buildSpecification(query);
+            final var expected = underTest.findAll(Pageable.unpaged())
+                    .filter(contact -> Instant.now().minus(durationFromNow).isBefore(contact.getCreatedAt()));
 
             // when
             final var actual = underTest.findAll(spec, Pageable.unpaged());
