@@ -16,6 +16,9 @@ import java.io.IOException;
 
 @TestConfiguration(proxyBeanMethods = false)
 public class TestcontainersConfig {
+    private static final int PORT_POSTGRESQL = 5432;
+    private static final int PORT_TOXIPROXY = 8666;
+
     private final Network network = Network.newNetwork();
 
     @Bean
@@ -23,7 +26,6 @@ public class TestcontainersConfig {
         //noinspection resource
         return new PostgreSQLContainer(DockerImageName.parse("postgres:18"))
                 .withDatabaseName("mydb")
-                .withExposedPorts(5432)
                 .withNetwork(network)
                 .withNetworkAliases("db");
     }
@@ -36,13 +38,13 @@ public class TestcontainersConfig {
     }
 
     @Bean
-    ToxiproxyClient toxiproxyClient(ToxiproxyContainer proxyHost) {
-        return new ToxiproxyClient(proxyHost.getHost(), proxyHost.getControlPort());
+    ToxiproxyClient toxiproxyClient(ToxiproxyContainer toxiproxyContainer) {
+        return new ToxiproxyClient(toxiproxyContainer.getHost(), toxiproxyContainer.getControlPort());
     }
 
     @Bean
     Proxy dbProxy(ToxiproxyClient toxiproxyClient) throws IOException {
-        final var result = toxiproxyClient.createProxy("db-proxy", "0.0.0.0:8666", "db:5432");
+        final var result = toxiproxyClient.createProxy("db-proxy", "0.0.0.0:%d".formatted(PORT_TOXIPROXY), "db:%d".formatted(PORT_POSTGRESQL));
 
 //        result.toxics().bandwidth("DOWN_BANDWIDTH", ToxicDirection.DOWNSTREAM, 1 << 5);
 //        result.toxics().latency("DOWN_LATENCY", ToxicDirection.DOWNSTREAM, 20); //.setJitter(100);
@@ -55,11 +57,15 @@ public class TestcontainersConfig {
 
     @Bean
     DataSource dataSource(
-            ToxiproxyContainer proxyHost,
+            ToxiproxyContainer toxiproxyContainer,
             PostgreSQLContainer postgresContainer,
             Proxy dbProxy /* dependency necessary to make sure the proxy is up and running */
     ) {
-        final var jdbcUrl = "jdbc:postgresql://%s:%d/%s".formatted(proxyHost.getHost(), proxyHost.getMappedPort(8666), postgresContainer.getDatabaseName());
+        final var jdbcUrl = "jdbc:postgresql://%s:%d/%s".formatted(
+                toxiproxyContainer.getHost(),
+                toxiproxyContainer.getMappedPort(PORT_TOXIPROXY),
+                postgresContainer.getDatabaseName()
+        );
         return DataSourceBuilder.create()
                 .url(jdbcUrl)
                 .username(postgresContainer.getUsername())
