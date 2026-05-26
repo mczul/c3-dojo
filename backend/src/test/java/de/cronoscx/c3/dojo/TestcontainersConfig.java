@@ -19,6 +19,8 @@ public class TestcontainersConfig {
     private static final int PORT_POSTGRESQL = 5432;
     private static final int PORT_TOXIPROXY = 8666;
 
+    private static final String NETWORK_ALIAS_DB = "db";
+
     private final Network network = Network.newNetwork();
 
     @Bean
@@ -27,7 +29,7 @@ public class TestcontainersConfig {
         return new PostgreSQLContainer(DockerImageName.parse("postgres:18"))
                 .withDatabaseName("mydb")
                 .withNetwork(network)
-                .withNetworkAliases("db");
+                .withNetworkAliases(NETWORK_ALIAS_DB);
     }
 
     @Bean
@@ -44,15 +46,11 @@ public class TestcontainersConfig {
 
     @Bean
     Proxy dbProxy(ToxiproxyClient toxiproxyClient) throws IOException {
-        final var result = toxiproxyClient.createProxy("db-proxy", "0.0.0.0:%d".formatted(PORT_TOXIPROXY), "db:%d".formatted(PORT_POSTGRESQL));
-
-//        result.toxics().bandwidth("DOWN_BANDWIDTH", ToxicDirection.DOWNSTREAM, 1 << 5);
-//        result.toxics().latency("DOWN_LATENCY", ToxicDirection.DOWNSTREAM, 20); //.setJitter(100);
-//
-//        result.toxics().bandwidth("UP_BANDWIDTH", ToxicDirection.UPSTREAM, 1 << 5);
-//        result.toxics().latency("UP_LATENCY", ToxicDirection.UPSTREAM, 20); //.setJitter(100);
-
-        return result;
+        return toxiproxyClient.createProxy(
+                "db-proxy",
+                "0.0.0.0:%d".formatted(PORT_TOXIPROXY),
+                "%s:%d".formatted(NETWORK_ALIAS_DB, PORT_POSTGRESQL)
+        );
     }
 
     @Bean

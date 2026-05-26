@@ -19,6 +19,7 @@ import org.springframework.test.context.TestPropertySource;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -54,15 +55,19 @@ class ContactRepositoryIT {
 
     @Nested
     class Search {
+        private static final int LATENCY_BASE_MILLIS = 20;
+        private static final int LATENCY_JITTER_MILLIS = 100;
+        private static final int BANDWIDTH_BYTES = 1 << 10;
+
+        private static final int TIMEOUT_MILLIS = 750;
 
         @BeforeEach
         void beforeEach() throws IOException {
-            dbProxy.toxics().bandwidth("DOWN_BANDWIDTH", ToxicDirection.DOWNSTREAM, 1 << 10);
-            dbProxy.toxics().latency("DOWN_LATENCY", ToxicDirection.DOWNSTREAM, 20).setJitter(100);
-            dbProxy.toxics().slicer("DOWN_SLICER", ToxicDirection.DOWNSTREAM, 1 << 5, 100);
+            dbProxy.toxics().bandwidth("DOWN_BANDWIDTH", ToxicDirection.DOWNSTREAM, BANDWIDTH_BYTES);
+            dbProxy.toxics().latency("DOWN_LATENCY", ToxicDirection.DOWNSTREAM, LATENCY_BASE_MILLIS).setJitter(LATENCY_JITTER_MILLIS);
 
-            dbProxy.toxics().bandwidth("UP_BANDWIDTH", ToxicDirection.UPSTREAM, 1 << 10);
-            dbProxy.toxics().latency("UP_LATENCY", ToxicDirection.UPSTREAM, 20).setJitter(100);
+            dbProxy.toxics().bandwidth("UP_BANDWIDTH", ToxicDirection.UPSTREAM, BANDWIDTH_BYTES);
+            dbProxy.toxics().latency("UP_LATENCY", ToxicDirection.UPSTREAM, LATENCY_BASE_MILLIS).setJitter(LATENCY_JITTER_MILLIS);
         }
 
         @AfterEach
@@ -73,6 +78,7 @@ class ContactRepositoryIT {
         }
 
         @Test
+        @Timeout(value = TIMEOUT_MILLIS, unit = TimeUnit.MILLISECONDS)
         void without_restrictions() {
             // given
             final var query = new ContactQuery(null, null, null);
@@ -94,6 +100,7 @@ class ContactRepositoryIT {
                 "test@example.org",
                 "doesnotexist",
         })
+        @Timeout(value = TIMEOUT_MILLIS, unit = TimeUnit.MILLISECONDS)
         void by_email(String email) {
             // given
             final var query = new ContactQuery(email, null, null);
@@ -117,7 +124,8 @@ class ContactRepositoryIT {
                 "PT1M",
                 "PT1H",
         })
-        void by_placeholder(Duration durationFromNow) {
+        @Timeout(value = TIMEOUT_MILLIS, unit = TimeUnit.MILLISECONDS)
+        void by_createdAfter(Duration durationFromNow) {
             // given
             final var query = new ContactQuery(null, Instant.now().minus(durationFromNow), null);
             final var spec = underTest.buildSpecification(query);
