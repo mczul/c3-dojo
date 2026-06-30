@@ -14,34 +14,34 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Optional;
 
-@RestController
-@RequestMapping(SpringAiMcpUseCases.API_PATH)
+//@RestController
+//@RequestMapping(SpringAiMcpUseCases.API_PATH)
 class SpringAiMcpUseCases {
-    static final String API_PATH = "/spring-ai-mcp";
-
-    private final ChatClient chatClient;
-
-    SpringAiMcpUseCases(@Qualifier(SpringAiMcpConfig.QUALIFIER_AI_MCP) ChatClient chatClient) {
-        this.chatClient = chatClient;
-    }
-
-    @PostMapping
-    String chat(@RequestBody String message) {
-        final var requestSpec = chatClient.prompt(new Prompt(
-                List.of(), /* */
-                OllamaChatOptions.builder()
-                        .temperature(0.2)
-                        .build()
-        ));
-
-        return Optional.ofNullable(requestSpec
-                        .user(message)
-                        .call()
-                        .chatResponse())
-                .flatMap(chatResponse -> Optional.ofNullable(chatResponse.getResult()))
-                .map(Generation::getOutput)
-                .map(AbstractMessage::getText)
-                .orElse("No response from LLM.");
-    }
+//    static final String API_PATH = "/spring-ai-mcp";
+//
+//    private final ChatClient chatClient;
+//
+//    SpringAiMcpUseCases(@Qualifier(SpringAiMcpConfig.QUALIFIER_AI_MCP) ChatClient chatClient) {
+//        this.chatClient = chatClient;
+//    }
+//
+//    @PostMapping
+//    String chat(@RequestBody String message) {
+//        final var requestSpec = chatClient.prompt(new Prompt(
+//                List.of(), /* */
+//                OllamaChatOptions.builder()
+//                        .temperature(0.2)
+//                        .build()
+//        ));
+//
+//        return Optional.ofNullable(requestSpec
+//                        .user(message)
+//                        .call()
+//                        .chatResponse())
+//                .flatMap(chatResponse -> Optional.ofNullable(chatResponse.getResult()))
+//                .map(Generation::getOutput)
+//                .map(AbstractMessage::getText)
+//                .orElse("No response from LLM.");
+//    }
 
 }

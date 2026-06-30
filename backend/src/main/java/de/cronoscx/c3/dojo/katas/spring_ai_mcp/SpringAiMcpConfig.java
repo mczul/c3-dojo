@@ -12,19 +12,19 @@ import org.springframework.context.annotation.Configuration;
 class SpringAiMcpConfig {
     static final String QUALIFIER_AI_MCP = "ai_mcp";
 
-    private final ToolCallbackProvider toolCallbackProvider;
+//    private final ToolCallbackProvider toolCallbackProvider;
 
-    @Bean
-    @Qualifier(SpringAiMcpConfig.QUALIFIER_AI_MCP)
-    ChatClient mcpChatClient(ChatClient.Builder builder) {
-        return builder.defaultSystem("""
-                        Du bist ein freundlicher Chatbot, der Fragen von Kunden des Unternehmens "Mustermann GmbH & Co KG"
-                        beantwortet.
-                        """
-                )
-                .defaultToolCallbacks(toolCallbackProvider)
-                .build();
-    }
+//    @Bean
+//    @Qualifier(SpringAiMcpConfig.QUALIFIER_AI_MCP)
+//    ChatClient mcpChatClient(ChatClient.Builder builder) {
+//        return builder.defaultSystem("""
+//                        Du bist ein freundlicher Chatbot, der Fragen von Kunden des Unternehmens "Mustermann GmbH & Co KG"
+//                        beantwortet.
+//                        """
+//                )
+//                .defaultToolCallbacks(toolCallbackProvider)
+//                .build();
+//    }
 
 
 }

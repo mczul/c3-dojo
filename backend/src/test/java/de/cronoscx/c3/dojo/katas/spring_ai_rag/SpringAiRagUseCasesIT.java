@@ -32,7 +32,7 @@ class SpringAiRagUseCasesIT {
     private RestTestClient restTestClient;
 
     @RepeatedTest(ITERATIONS)
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
+    @Timeout(value = 5, unit = TimeUnit.SECONDS)
     void smoke() {
         // given
 

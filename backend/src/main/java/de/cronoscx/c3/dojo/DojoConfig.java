@@ -8,9 +8,11 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -19,8 +21,19 @@ import java.util.List;
 @Configuration
 @EnableConfigurationProperties(DojoManagementConfigProperties.class)
 @EnableMethodSecurity
+@EnableWebSecurity
 @EnableSpringDataWebSupport(pageSerializationMode = PageSerializationMode.VIA_DTO)
 class DojoConfig {
+
+    @Bean
+    UserDetailsService inMemoryUserDetailsManager() {
+        return new InMemoryUserDetailsManager(
+                User.withUsername("user")
+                        .password("{noop}pass")
+                        .roles("USER")
+                        .build()
+        );
+    }
 
     @Bean
     @Order(1)
@@ -46,11 +59,16 @@ class DojoConfig {
 
     @Bean
     @Order(2)
-    SecurityFilterChain apiFilterChain(HttpSecurity http) {
+    SecurityFilterChain sseFilterChain(HttpSecurity http) {
         return http
-                .securityMatcher("/api/**")
+                .securityMatcher("/sse/**")
                 .sessionManagement(SessionManagementConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
+                .httpBasic(customizer -> customizer.realmName("C3 Dojo :: SSE"))
+                .authorizeHttpRequests(customizer -> {
+                    customizer.requestMatchers("/sse/dummy").authenticated()
+                            .anyRequest().permitAll();
+                })
                 .build();
     }
 

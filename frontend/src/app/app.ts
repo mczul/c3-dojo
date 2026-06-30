@@ -13,6 +13,7 @@ import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
           <ul>
             <li><a [routerLink]="['katas', 'sql', 'dml']" routerLinkActive="c3-link--active">SQL :: DML</a></li>
             <li><a [routerLink]="['katas', 'css', 'marc']" routerLinkActive="c3-link--active">CSS :: Marc</a></li>
+            <li><a [routerLink]="['katas', 'sse', 'dummy']" routerLinkActive="c3-link--active">SSE :: Dummy</a></li>
           </ul>
         </nav>
       </header>
